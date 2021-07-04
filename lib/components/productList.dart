@@ -11,13 +11,15 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
   List<Widget> _productTiles = [];
-  final GlobalKey _listKey = GlobalKey();
+  GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final String description =
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries";
 
   @override
   void initState() {
-    _addProducts();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _addProducts();
+    });
     super.initState();
   }
 
@@ -64,21 +66,18 @@ class _ProductListState extends State<ProductList> {
           salePrice: 1050,
           rating: 4.5,
           reviewCount: 12),
-      Product(
-          id: 5,
-          name: 'Product Name 5',
-          image: 'p1.jpg',
-          description: description,
-          unit: '250 gm',
-          price: 1200,
-          salePrice: 1050,
-          rating: 4.5,
-          reviewCount: 12),
     ];
+
+    Future ft = Future((){});
 
     //add all products into productTiles
     _products.forEach((Product product) {
-      _productTiles.add(_buildTile(product));
+      ft = ft.then((value){
+        return Future.delayed(const Duration(milliseconds: 100),(){
+          _productTiles.add(_buildTile(product));
+          _listKey.currentState!.insertItem(_productTiles.length - 1);
+        });
+      });
     });
   }
 
@@ -104,23 +103,30 @@ class _ProductListState extends State<ProductList> {
         ],
       ),
       leading: ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: Image.asset(
-          'images/${product.image}',
-          height: 50.0,
+        borderRadius: BorderRadius.circular(5.0),
+        child: Hero(
+          tag: 'images/${product.image}',
+          child: Image.asset(
+            'images/${product.image}',
+            height: 50.0,
+          ),
         ),
       ),
       trailing: Text('\$${product.price}'),
     );
   }
+  Tween<Offset> _offset = Tween(begin: Offset(1,0), end: Offset(0,0));
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return AnimatedList(
       key: _listKey,
-      itemCount: _productTiles.length,
-      itemBuilder: (BuildContext context, int index) {
-        return _productTiles[index];
+      initialItemCount: _productTiles.length,
+      itemBuilder: (BuildContext context, int index, Animation animation) {
+        return SlideTransition(
+            position: animation.drive(_offset),
+          child: _productTiles[index],
+        );
       },
     );
   }
