@@ -12,6 +12,7 @@ class _AnimatedFABState extends State<AnimatedFAB> with SingleTickerProviderStat
   late Animation<double> _animateIcon;
   late Animation _colorAnimation;
   Curve _curve = Curves.easeOut;
+  bool isPlay = false;
 
   @override
   void initState() {
@@ -23,13 +24,24 @@ class _AnimatedFABState extends State<AnimatedFAB> with SingleTickerProviderStat
     _animateIcon = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
 
     _controller.addStatusListener((status) {
-      print('status = $status');
+      if(status == AnimationStatus.completed){
+        setState(() {
+          isPlay = true;
+        });
+
+      }
+      if(status == AnimationStatus.dismissed){
+        setState(() {
+          isPlay = false;
+        });
+
+      }
     });
 
-    _controller.addListener(() {
-      setState(() {
-      });
-    });
+    // _controller.addListener(() {
+    //   setState(() {
+    //   });
+    // });
     super.initState();
   }
 
@@ -38,7 +50,7 @@ class _AnimatedFABState extends State<AnimatedFAB> with SingleTickerProviderStat
     return FloatingActionButton(
       backgroundColor: _colorAnimation.value,
         onPressed: (){
-          _controller.forward();
+          isPlay ?_controller.reverse() :_controller.forward();
         },
         child: AnimatedIcon(
         icon: AnimatedIcons.pause_play,
