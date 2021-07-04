@@ -1,3 +1,4 @@
+import 'package:animation/components/fab.dart';
 import 'package:animation/components/productList.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +15,7 @@ class MyHero extends StatelessWidget {
         title: Text("Hero Animation Home"),
       ),
       body: ProductList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-
-        },
-        child: Icon(Icons.shopping_cart_outlined),
-      ),
+      floatingActionButton: AnimatedFAB(),
     );
   }
 }
